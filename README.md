@@ -1,6 +1,6 @@
 # **Configrouter**
 
-### Flexible router for quickly building web services. Built atop the powerful [router-parser](https://github.com/rcs/route-parser).
+#### Flexible router for quickly building web services. Built atop the powerful [router-parser](https://github.com/rcs/route-parser).
 
 ## Installation
 
@@ -48,9 +48,9 @@ let routes = {
   },
 ```
 
-#### Routes much be unique to the method it is defined under. Each parent HTTP method must contain a "default" and "notFound" route and handler.
+#### Routes must be unique to the method it is defined under. Each parent HTTP method must contain a "default" and "notFound" route and handler.
 
-#### Finally create and call the Router
+### Finally create and call the Router
 
 ```js
   let Router = new ConfigRouter();
