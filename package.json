@@ -1,0 +1,26 @@
+{
+  "name": "coolrouter",
+  "version": "1.0.0",
+  "description": "Easily configurable router",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "route-parser": "^0.0.4"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "mocha": "^2.3.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "router",
+    "parser",
+    "server"
+  ],
+  "author": "Eric Obodo",
+  "license": "MIT"
+}
