@@ -1,8 +1,8 @@
 'use strict';
 
 let Http = require('http');
-let CoolRouter = require('../index.js');
-let Router = new CoolRouter();
+let ConfigRouter = require('../index.js');
+let Router = new ConfigRouter();
 let expect = require('chai').expect;
 
 let routes = {
@@ -70,7 +70,6 @@ let tester = () => {
       });
     });
   }
-  console.log('Hey');
   //server.close();
 };
 
