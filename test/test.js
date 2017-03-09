@@ -1,30 +1,34 @@
 'use strict';
 
-let Http = require('http');
-let ConfigRouter = require('../index.js');
-let Router = new ConfigRouter();
-let expect = require('chai').expect;
+let http = require('http');
+let Router = require('../index.js');
+let expect = require('expect');
 
+//Create routes
 let routes = {
   'GET': {
     '/': (req, res) => {
-      res.end('Path: Get /');
+      res.end('Path: At home');
+    },
+    '/clean': (req, res) => {
+      res.end('Path: Got clean');
     },
     'default': (req, res) => {
-      res.end('Path: Get default');
+      res.end('Path: Default route');
     },
   },
   'PUT': {
     '/': (req, res) => {
-      res.end('Path: Put /');
+      res.end('Path: Home Put');
     },
     'default': (req, res) => {
-      res.end('Path: Put default');
+      res.end('Path: Default Put');
     },
   },
 };
 
-let reqList = []
+//Create test requests
+let reqList = [];
 let testData = [
   { method: 'GET', path: '/'},
   { method: 'GET', path: '/clean'},
@@ -41,36 +45,49 @@ for (let m in testData) {
   });
 }
 
+function testResponse(count, body) {
+  switch (count) {
+    case 0:
+      expect(body).toBe('Path: At home');
+    break;
+    case 1:
+      expect(body).toBe('Path: Got clean');
+    break;
+    case 2:
+      expect(body).toBe('Path: Home Put');
+    break;
+    case 3:
+      expect(body).toBe('Path: Default Put');
+      console.log('Test completed successfully');
+      server.close();
+    break;
+    /*
+    default:
+    break;
+    */
+  }
+}
+
+//Init router
 Router.init(routes);
 
-let server = Http.createServer((req, res) => {
+function startTestHook() {
+  for (let count = 0; count < reqList.length; count++) {
+    http.get(reqList[count], (pendingReq) => {
+      
+      //pendingReq.on('response', testResponse);
+      pendingReq.on('data', (data) => {
+        testResponse(count, data.toString());
+      });
+      //pendingReq.on('response', (res) => {console.log(res)});
+    });
+    //request.on('response', handleReq);
+  }
+}
+
+//Init Server
+let server = http.createServer((req, res) => {
   Router.route(req, res);
 });
 
-let tester = () => {
-  for (let count = 0; count < reqList.length; count++) {
-    Http.get(reqList[count]).on('response', (_req) => {
-      _req.on('data', (body) => {
-        console.log(body.toString());
-        switch (count) {
-          case 0:
-            expect(body.toString()).to.equal('Path: Get /');
-            break;
-          case 1:
-            expect(body.toString()).to.equal('Path: Get default');
-            break;
-          case 2:
-            expect(body.toString()).to.equal('Path: Put /');
-            break;
-          case 3:
-            expect(body.toString()).to.equal('Path: Put default');
-            break;
-          default:
-        };
-      });
-    });
-  }
-  //server.close();
-};
-
-server.listen(8080, 'localhost', tester);
+server.listen(8080, 'localhost', startTestHook);
