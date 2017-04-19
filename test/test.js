@@ -7,21 +7,21 @@ let expect = require('expect');
 //Create routes
 let routes = {
   'GET': {
-    '/': (req, res) => {
+    '/': (req, res, params) => {
       res.end('Path: At home');
     },
-    '/clean': (req, res) => {
+    '/clean': (req, res, params) => {
       res.end('Path: Got clean');
     },
-    'default': (req, res) => {
+    'notFound': (req, res, params) => {
       res.end('Path: Default route');
     },
   },
-  'PUT': {
-    '/': (req, res) => {
+  'POST': {
+    '/': (req, res, params) => {
       res.end('Path: Home Put');
     },
-    'default': (req, res) => {
+    'notFound': (req, res, parms) => {
       res.end('Path: Default Put');
     },
   },
@@ -32,8 +32,8 @@ let reqList = [];
 let testData = [
   { method: 'GET', path: '/'},
   { method: 'GET', path: '/clean'},
-  { method: 'PUT', path: '/'},
-  { method: 'PUT', path: '/something'},
+  { method: 'POST', path: '/'},
+  { method: 'POST', path: '/something'},
 ];
 
 for (let m in testData) {
@@ -69,7 +69,7 @@ function testResponse(count, body) {
 }
 
 //Init router
-Router.init(routes);
+let router = new Router(routes);
 
 function startTestHook() {
   for (let count = 0; count < reqList.length; count++) {
@@ -87,7 +87,7 @@ function startTestHook() {
 
 //Init Server
 let server = http.createServer((req, res) => {
-  Router.route(req, res);
+  router.route(req, res);
 });
 
 server.listen(8080, 'localhost', startTestHook);

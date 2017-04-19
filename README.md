@@ -36,27 +36,25 @@ let myHandler = (req, res, params) => res.end('Hello World');
 let routes = {
   'GET': {
     '/path/:with/params': myHandler,
-    'default': (req, res, params) {
-      //Handle request
-    },
     'notFound': (req, res, params) {
       //Handle request
     },
   },
-  'PUT': {
+  'POST': {
     //etc
   },
 ```
 
 Routes must be unique to the method it is defined under. Each parent HTTP method must contain a "default" and "notFound" route and handler.
 
-Finally create and call the Router
+Finally create a new instance and pass in the http request/response pair.
 
 ```js
-  let Router = new ConfigRouter();
+  const Router = require('path/to/config-router');
 
-  Router.init(routes);
+  let router = new Router(routes);
 
-  //Server goes here
-  Router.route(req, res)
+  let server = http.createServer((req, res) => {
+    router.route(req, res);
+  });
 ```
