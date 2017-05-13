@@ -8,86 +8,96 @@ let expect = require('expect');
 let routes = {
   'GET': {
     '/': (req, res, params) => {
-      res.end('Path: At home');
+      res.end('GET home');
     },
     '/clean': (req, res, params) => {
-      res.end('Path: Got clean');
+      res.end('GET clean');
     },
-    'notFound': (req, res, params) => {
-      res.end('Path: Default route');
+    '/notFound': (req, res, params) => {
+      res.end('GET notFound');
     },
   },
   'POST': {
     '/': (req, res, params) => {
-      res.end('Path: Home Put');
+      res.end('POST home');
     },
-    'notFound': (req, res, parms) => {
-      res.end('Path: Default Put');
+    '/clean': (req, res, params) => {
+      res.end('POST clean');
+    },
+    '/notFound': (req, res, parms) => {
+      res.end('POST notFound');
+    },
+  },
+  'PUT': {
+    '/a': (req, res, params) => {
+      res.end('PUT a');
+    },
+    '/b': (req, res, params) => {
+      res.end('PUT b');
+    },
+    '/notFound': (req, res, parms) => {
+      res.end('PUT notFound');
     },
   },
 };
 
-//Create test requests
-let reqList = [];
-let testData = [
-  { method: 'GET', path: '/'},
-  { method: 'GET', path: '/clean'},
-  { method: 'POST', path: '/'},
-  { method: 'POST', path: '/something'},
-];
-
-for (let m in testData) {
-  reqList.push({
-    hostname: 'localhost',
-    port: '8080',
-    method: testData[m].method,
-    path: testData[m].path,
-  });
-}
-
-function testResponse(count, body) {
-  switch (count) {
-    case 0:
-      expect(body).toBe('Path: At home');
-    break;
-    case 1:
-      expect(body).toBe('Path: Got clean');
-    break;
-    case 2:
-      expect(body).toBe('Path: Home Put');
-    break;
-    case 3:
-      expect(body).toBe('Path: Default Put');
-      console.log('Test completed successfully');
-      server.close();
-    break;
-    /*
-    default:
-    break;
-    */
-  }
-}
-
 //Init router
 let router = new Router(routes);
 
+
 function startTestHook() {
-  for (let count = 0; count < reqList.length; count++) {
-    http.get(reqList[count], (pendingReq) => {
-      
-      //pendingReq.on('response', testResponse);
-      pendingReq.on('data', (data) => {
-        testResponse(count, data.toString());
-      });
-      //pendingReq.on('response', (res) => {console.log(res)});
+  //Create test requests
+  let reqList = [];
+  let testData = [
+    { method: 'GET', path: '/', err: 'GET home'},
+    { method: 'GET', path: '/clean', err: 'GET clean'},
+    { method: 'GET', path: '/wrongPath', err: 'GET notFound'},
+    { method: 'POST', path: '/', err: 'POST home'},
+    { method: 'POST', path: '/clean', err: 'POST clean'},
+    { method: 'POST', path: '/wrongPath', err: 'POST notFound'},
+    { method: 'PUT', path: '/a', err: 'PUT a'},
+    { method: 'PUT', path: '/b', err: 'PUT b'},
+    { method: 'PUT', path: '/c', err: 'PUT notFound'},
+  ];
+
+  for (let m in testData) {
+    reqList.push({
+      hostname: 'localhost',
+      port: '8080',
+      method: testData[m].method,
+      path: testData[m].path,
     });
-    //request.on('response', handleReq);
+  }
+
+  for (let count = 0; count < reqList.length; count++) {
+    //test('Expect');
+
+    let currentReq = reqList[count];
+    http.get(currentReq, (pendingReq) => {
+
+      pendingReq.on('data', (data) => {
+        expect(data.toString()).toBe(testData[count].err)
+
+        console.log(count, currentReq);
+
+        if (count === reqList.length-1) {
+          console.log('\nTest completed successfully');
+          serverRef.close();
+        }
+      });
+    });
   }
 }
 
-//Init Server
-let server = http.createServer((req, res) => {
-  router.route(req, res);
-});
+let serverRef;
 
-server.listen(8080, 'localhost', startTestHook);
+(function() {
+  //Init Server
+  let server = http.createServer((req, res) => {
+    router.route(req, res);
+  });
+
+  serverRef = server;
+  server.listen(8080, 'localhost', startTestHook);
+
+})();
