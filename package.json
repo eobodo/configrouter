@@ -1,25 +1,25 @@
 {
   "name": "configrouter",
   "version": "0.0.1",
-  "description": "Easily configurable router",
+  "description": "Flexible router for quickly building/testing web services.",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "route-parser": "^0.0.4"
+    "route-parser": "^0.0.5"
   },
   "devDependencies": {
-    "expect": "^1.20.2",
-    "jest": "^20.0.1"
+    "expect": "^1.20.2"
   },
   "scripts": {
-    "test": "jest"
+    "test": "node test/test.js"
   },
   "keywords": [
     "router",
-    "parser",
-    "server"
+    "routing",
+    "match",
+    "map"
   ],
   "author": "Eric Obodo",
   "license": "MIT"

@@ -1,6 +1,6 @@
 # **Configrouter**
 
-#### Flexible router for quickly building web services. Built atop the powerful [router-parser](https://github.com/rcs/route-parser).
+#### Flexible router for quickly building/testing web services. Built atop the powerful [router-parser](https://github.com/rcs/route-parser).
 
 ## Installation
 
@@ -14,45 +14,53 @@ First import the module into your code.
 let ConfigRouter = require('configrouter');
 ```
 
-Then follow this schema.
+Then define your routes following this simple schema.
 
 ```
- Object {
+handler = Function(req, res, params)
+
+Object {
   String httpMethod1: Object {
-    Optional String route1: Function handler<req, res, params>,
-    Optional String route2: Function handler<req, res, params>,
-    Required String 'default': handler
-    Required String 'notFound': handler
+    String /route1: handler,  //optional
+    String /route2: handler,  //optional
+    String /noMatch: handler  //required
   },
-  etc...
 }
 ```
 
-Here is an example.
+Example:
 
 ```js
-let myHandler = (req, res, params) => res.end('Hello World');
+let myHandler = (req, res, params) => {
+  if (params.number === '42') {
+    res.end('Hello World');
+  }
+};
 
 let routes = {
   'GET': {
-    '/path/:with/params': myHandler,
-    'notFound': (req, res, params) {
+    '/': myHandler,
+    '/:number': myHandler,
+    'notFound': (req, res) => {
       //Handle request
     },
   },
   'POST': {
-    //etc
+    'notFound': (req, res) => {
+      //Handle request
+    },
   },
 ```
 
-Routes must be unique to the method it is defined under. Each parent HTTP method must contain a "default" and "notFound" route and handler.
+Routes resolve in insertion order. In the case of duplicate entries, the latter route wins.
 
-Finally create a new instance and pass in the http request/response pair.
+Best practice is to define your routes in a separate file and import it into your server.
 
 ```js
-  const Router = require('path/to/config-router');
+  const ConfigRouter = require('configrouter');
+  const routes = require('path/to/routes.js')
 
-  let router = new Router(routes);
+  let router = new ConfigRouter(routes);
 
   let server = http.createServer((req, res) => {
     router.route(req, res);
