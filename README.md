@@ -1,6 +1,6 @@
 # **Configrouter**
 
-#### Flexible router for quickly building/testing web services. Built atop the powerful [router-parser](https://github.com/rcs/route-parser).
+Flexible router for quickly building/testing web services. Powered by [route-parser](https://github.com/rcs/route-parser).
 
 ## Installation
 
@@ -54,7 +54,7 @@ let routes = {
 
 Routes resolve in insertion order. In the case of duplicate entries, the latter route wins.
 
-Best practice is to define your routes in a separate file and import it into your server.
+Best practice is to define your routes/handlers in a separate file, then import it into your server.
 
 ```js
   const ConfigRouter = require('configrouter');
